@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: shop_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - shop_network
+
+  product-service:
+    build:
+      context: ./ProductManagmentService/src
+      dockerfile: Dockerfile
+    container_name: product_service
+    depends_on:
+      - postgres
+    ports:
+      - "3002:8080"
+    networks:
+      - shop_network
+
+  user-service:
+    build:
+      context: ./UserManagmentService/src
+      dockerfile: Dockerfile
+    container_name: user_service
+    depends_on:
+      - postgres
+    ports:
+      - "3001:8080"
+    networks:
+      - shop_network
+
+  api-gateway:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    depends_on:
+      - product-service
+      - user-service
+    ports:
+      - "3000:8080"
+    networks:
+      - shop_network
+
+volumes:
+  postgres_data:
+
+networks:
+  shop_network:
+    driver: bridge

@@ -1,0 +1,7 @@
+@WebApi_HostAddress = http://localhost:3001
+
+GET {{WebApi_HostAddress}}/api/user
+Accept: application/json
+Authorization: Bearer <Token>
+
+###
